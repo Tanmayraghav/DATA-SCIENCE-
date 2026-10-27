@@ -1,187 +1,146 @@
-# Student Performance Prediction
-# Run this file cell-by-cell in Google Colab, or run it as a Python script.
+# Student Performance Prediction Project
+# Run these cells in Google Colab, from top to bottom.
 
-# 1. Install the UCI dataset package
+# Install the dataset package
 %pip -q install ucimlrepo
 
-# 2. Import libraries
+# 1. Import basic libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from ucimlrepo import fetch_ucirepo
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-# 3. Download the UCI Student Performance dataset
+# 2. Load the dataset
 student_data = fetch_ucirepo(id=320)
+X_raw = student_data.data.features
+y_raw = student_data.data.targets
 
-# 4. Combine student details and grades into one table
-X_data = student_data.data.features
-y_data = student_data.data.targets
-df = pd.concat([X_data, y_data], axis=1)
+# Put everything into one simple dataframe
+df = pd.concat([X_raw, y_raw], axis=1)
 
-# 5. Show the first five rows
+# 3. Check the data
+print("First 5 rows:")
 display(df.head())
 
-# 6. Show the number of rows and columns
-print("Dataset shape:", df.shape)
+print("Rows and columns:", df.shape)
+print("Column names:", df.columns.tolist())
+print("Data types:\n", df.dtypes)
 
-# 7. Show all column names
-print(df.columns.tolist())
-
-# 8. Check column data types
-print(df.dtypes)
-
-# 9. Count missing values
-print(df.isnull().sum())
-
-# 10. Count duplicate rows
+# 4. Check for missing values and duplicates
+print("Missing values:\n", df.isnull().sum())
 print("Duplicate rows:", df.duplicated().sum())
 
-# 11. Remove duplicate rows
+# Remove duplicate rows
 df = df.drop_duplicates().copy()
 
-# 12. Convert the target grade to numeric
-df["G3"] = pd.to_numeric(df["G3"], errors="coerce")
-df = df.dropna(subset=["G3"]).copy()
+# 5. Make visualizations (graphs)
 
-# 13. Graph 1: Final grade distribution
-plt.figure(figsize=(7, 4))
-sns.histplot(data=df, x="G3", bins=15, kde=True)
-plt.title("Distribution of Final Grades")
-plt.xlabel("Final grade (G3)")
-plt.ylabel("Number of students")
+# Graph 1: Histogram of final grades (G3)
+plt.hist(df["G3"], bins=15, edgecolor="black")
+plt.title("Final Grades Distribution")
+plt.xlabel("Final Grade (G3)")
+plt.ylabel("Count")
 plt.show()
 
-# 14. Graph 2: Study time and average final grade
-plt.figure(figsize=(7, 4))
-sns.barplot(data=df, x="studytime", y="G3", errorbar=None)
+# Graph 2: Bar chart of study time vs final grade
+sns.barplot(x="studytime", y="G3", data=df, errorbar=None)
 plt.title("Study Time vs Average Final Grade")
-plt.xlabel("Study time group")
-plt.ylabel("Average final grade")
+plt.xlabel("Study Time")
+plt.ylabel("Average Final Grade")
 plt.show()
 
-# 15. Graph 3: Second-period grade vs final grade
-plt.figure(figsize=(7, 4))
-sns.scatterplot(data=df, x="G2", y="G3")
-plt.title("Second-Period Grade vs Final Grade")
-plt.xlabel("Second-period grade (G2)")
-plt.ylabel("Final grade (G3)")
+# Graph 3: Scatter plot of G2 vs G3
+plt.scatter(df["G2"], df["G3"])
+plt.title("Second Period Grade (G2) vs Final Grade (G3)")
+plt.xlabel("G2")
+plt.ylabel("G3")
 plt.show()
 
-# 16. Graph 4: Absences and possible outliers
-plt.figure(figsize=(7, 3))
-sns.boxplot(data=df, x="absences")
-plt.title("Outlier Check for Absences")
-plt.xlabel("Absences")
+# Graph 4: Boxplot to check outliers in absences
+sns.boxplot(x=df["absences"])
+plt.title("Boxplot of Absences")
 plt.show()
 
-# 17. Graph 5: Correlation between numeric columns
-numeric_df = df.select_dtypes(include="number")
-plt.figure(figsize=(12, 8))
-sns.heatmap(numeric_df.corr(), cmap="coolwarm", annot=False)
+# Graph 5: Correlation heatmap (numeric columns only)
+num_df = df.select_dtypes(include="number")
+plt.figure(figsize=(10, 6))
+sns.heatmap(num_df.corr(), cmap="coolwarm")
 plt.title("Correlation Heatmap")
 plt.show()
 
-# 18. Show simple data analysis by study time
-display(df.groupby("studytime")["G3"].agg(["count", "mean"]).rename(
-    columns={"count": "number_of_students", "mean": "average_final_grade"}
-))
+# Simple grouping: average grade for each study time
+print(df.groupby("studytime")["G3"].mean())
 
-# 19. Separate input columns (X) and target grade (y)
-X = df.drop(columns=["G3"])
+# 6. Separate features (X) and target (y)
+X = df.drop("G3", axis=1)
 y = df["G3"]
 
-# 20. Split data into training and testing parts
+# 7. Split into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.20, random_state=42
+    X, y, test_size=0.2, random_state=42
 )
 
-# 21. Find outlier limits using the training data only
-q1 = X_train["absences"].quantile(0.25)
-q3 = X_train["absences"].quantile(0.75)
-iqr = q3 - q1
-lower_limit = q1 - 1.5 * iqr
-upper_limit = q3 + 1.5 * iqr
-print("Lower outlier limit:", lower_limit)
-print("Upper outlier limit:", upper_limit)
+# 8. Remove absences outliers from training data only
+Q1 = X_train["absences"].quantile(0.25)
+Q3 = X_train["absences"].quantile(0.75)
+IQR = Q3 - Q1
 
-# 22. Remove outliers from the training data
-keep_rows = X_train["absences"].between(lower_limit, upper_limit)
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+keep_rows = X_train["absences"].between(lower, upper)
 X_train = X_train.loc[keep_rows].copy()
 y_train = y_train.loc[keep_rows].copy()
-print("Training rows after outlier removal:", len(X_train))
 
-# 23. Find text and numeric input columns
-categorical_columns = X_train.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
-numeric_columns = X_train.select_dtypes(include="number").columns.tolist()
-print("Categorical columns:", categorical_columns)
-print("Numeric columns:", numeric_columns)
+print("Training rows after removing outliers:", X_train.shape[0])
 
-# 24. Demonstrate Min-Max scaling on two numeric columns
-minmax_scaler = MinMaxScaler()
-example_columns = [column for column in ["age", "absences"] if column in X_train.columns]
-if example_columns:
-    scaled_example = minmax_scaler.fit_transform(X_train[example_columns])
-    scaled_example_df = pd.DataFrame(
-        scaled_example, columns=example_columns, index=X_train.index
-    )
-    display(scaled_example_df.head())
+# 9. Convert text columns to numbers (One-Hot Encoding)
+# Make training and testing columns match
+X_train = pd.get_dummies(X_train, drop_first=True)
+X_test = pd.get_dummies(X_test, drop_first=True)
+X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
 
-# 25. Set up encoding and standardization
-preprocessor = ColumnTransformer(
-    transformers=[
-        ("numbers", StandardScaler(), numeric_columns),
-        ("categories", OneHotEncoder(handle_unknown="ignore"), categorical_columns),
-    ]
-)
+# 10. Feature Scaling
+# Demonstrate Min-Max Scaling on age and absences
+example_columns = ["age", "absences"]
+minmax = MinMaxScaler()
+print("Sample Min-Max scaled values (first 5 rows):")
+print(minmax.fit_transform(X_train[example_columns])[:5])
 
-# 26. Build the Linear Regression model
-model = Pipeline(steps=[
-    ("preprocessing", preprocessor),
-    ("regression", LinearRegression())
-])
+# Standardize all features; fit only on training data
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# 27. Train the model
-model.fit(X_train, y_train)
-print("Model training complete.")
+# 11. Train Linear Regression Model
+model = LinearRegression()
+model.fit(X_train_scaled, y_train)
 
-# 28. Predict final grades for the test data
-y_pred = model.predict(X_test)
+# 12. Make predictions
+predictions = model.predict(X_test_scaled)
 
-# 29. Evaluate the model
-mae = mean_absolute_error(y_test, y_pred)
-rmse = mean_squared_error(y_test, y_pred) ** 0.5
-r2 = r2_score(y_test, y_pred)
+# 13. Evaluate the model
+mae = mean_absolute_error(y_test, predictions)
+mse = mean_squared_error(y_test, predictions)
+rmse = mse ** 0.5
+r2 = r2_score(y_test, predictions)
 
-print("Mean Absolute Error (MAE):", round(mae, 2))
-print("Root Mean Squared Error (RMSE):", round(rmse, 2))
-print("R-squared (R2):", round(r2, 2))
+print("MAE:", round(mae, 2))
+print("RMSE:", round(rmse, 2))
+print("R2 Score:", round(r2, 2))
 
-# 30. Compare actual and predicted grades
-comparison = pd.DataFrame({
-    "Actual grade": y_test,
-    "Predicted grade": y_pred.round(2)
-})
-display(comparison.head(10))
+# 14. Compare actual vs predicted grades
+results = pd.DataFrame({"Actual": y_test, "Predicted": predictions.round(2)})
+display(results.head(10))
 
-# 31. Graph: Actual grades vs predicted grades
-plt.figure(figsize=(6, 5))
-sns.scatterplot(x=y_test, y=y_pred)
-plt.plot([0, 20], [0, 20], linestyle="--")
-plt.title("Actual vs Predicted Final Grades")
-plt.xlabel("Actual grade")
-plt.ylabel("Predicted grade")
+# Graph: Actual vs Predicted
+plt.scatter(y_test, predictions)
+plt.xlabel("Actual Grades")
+plt.ylabel("Predicted Grades")
+plt.title("Actual vs Predicted Grades")
 plt.show()
-
-# 32. Try a sample prediction
-sample_student = X_test.iloc[[0]]
-sample_actual_grade = y_test.iloc[0]
-sample_predicted_grade = model.predict(sample_student)[0]
-print("Actual final grade:", sample_actual_grade)
-print("Predicted final grade:", round(sample_predicted_grade, 2))
