@@ -1,116 +1,136 @@
-!pip install ucimlrepo
+"""
+Student Performance Prediction
+Predicts final Mathematics grade (G3) using the UCI Student Performance dataset.
+Run: python student_performance_prediction.py
+"""
 
-import pandas as pd
-import numpy as np
+from pathlib import Path
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-from ucimlrepo import fetch_ucirepo
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+)
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
-# loading student dataset
-data = fetch_ucirepo(id=320)
-x = data.data.features
-y = data.data.targets
 
-# combining both into one dataframe
-df = pd.concat([x, y], axis=1)
-df.head()
+DATA_PATH = Path(__file__).resolve().parent / "student-mat.csv"
 
-# checking shape and data types
-print(df.shape)
-print(df.columns)
-print(df.dtypes)
 
-# checking null values and duplicates
-print(df.isnull().sum())
-print("duplicates:", df.duplicated().sum())
+def main():
+    # Load the Mathematics dataset (CSV uses semicolons as separators).
+    if not DATA_PATH.exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {DATA_PATH}. Keep student-mat.csv beside this script."
+        )
 
-df = df.drop_duplicates()
+    df = pd.read_csv(DATA_PATH, sep=";")
 
-# plotting final grade distribution
-plt.hist(df['G3'], bins=15)
-plt.title('Final Grade Distribution')
-plt.xlabel('G3')
-plt.ylabel('count')
-plt.show()
+    # Inspect data quality.
+    print("Dataset shape:", df.shape)
+    print("\nColumns:\n", df.columns.tolist())
+    print("\nData types:\n", df.dtypes)
+    print("\nMissing values:\n", df.isnull().sum())
+    print("\nDuplicate rows:", df.duplicated().sum())
+    df = df.drop_duplicates().copy()
 
-# studytime vs final grade
-sns.barplot(x='studytime', y='G3', data=df)
-plt.title('studytime vs G3')
-plt.show()
+    # Exploratory data analysis.
+    plt.figure(figsize=(8, 5))
+    plt.hist(df["G3"], bins=15, edgecolor="black")
+    plt.title("Final Grade (G3) Distribution")
+    plt.xlabel("Final grade")
+    plt.ylabel("Number of students")
+    plt.tight_layout()
+    plt.show()
 
-# scatter plot between G2 and G3
-plt.scatter(df['G2'], df['G3'])
-plt.xlabel('G2 grade')
-plt.ylabel('G3 grade')
-plt.title('G2 vs G3')
-plt.show()
+    plt.figure(figsize=(8, 5))
+    sns.barplot(data=df, x="studytime", y="G3", errorbar=None)
+    plt.title("Study Time vs Final Grade")
+    plt.xlabel("Weekly study-time category")
+    plt.ylabel("Average final grade (G3)")
+    plt.tight_layout()
+    plt.show()
 
-# checking outliers in absences
-sns.boxplot(x=df['absences'])
-plt.show()
+    plt.figure(figsize=(8, 5))
+    plt.scatter(df["G2"], df["G3"], alpha=0.7)
+    plt.xlabel("Second-period grade (G2)")
+    plt.ylabel("Final grade (G3)")
+    plt.title("Second-period Grade vs Final Grade")
+    plt.tight_layout()
+    plt.show()
 
-# correlation heatmap for numerical columns
-num_cols = df.select_dtypes(include=['int64', 'float64'])
-plt.figure(figsize=(10, 7))
-sns.heatmap(num_cols.corr(), cmap='coolwarm')
-plt.show()
+    plt.figure(figsize=(8, 3))
+    sns.boxplot(x=df["absences"])
+    plt.title("Absences: Box Plot")
+    plt.tight_layout()
+    plt.show()
 
-# average grade by studytime
-print(df.groupby('studytime')['G3'].mean())
+    numeric_df = df.select_dtypes(include=np.number)
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(numeric_df.corr(), cmap="coolwarm", center=0)
+    plt.title("Correlation Heatmap (Numerical Variables)")
+    plt.tight_layout()
+    plt.show()
 
-# removing outliers from absences using IQR method
-q1 = df['absences'].quantile(0.25)
-q3 = df['absences'].quantile(0.75)
-iqr = q3 - q1
+    print("\nAverage final grade by study time:")
+    print(df.groupby("studytime")["G3"].mean())
 
-low = q1 - 1.5 * iqr
-high = q3 + 1.5 * iqr
+    # Separate target and features before splitting.
+    # G1 and G2 are included because earlier grades are available as inputs.
+    X = df.drop(columns=["G3"])
+    y = df["G3"]
 
-df = df[(df['absences'] >= low) & (df['absences'] <= high)]
-print("shape after outlier removal:", df.shape)
+    X_train_raw, X_test_raw, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-# converting categorical columns to numeric
-df_new = pd.get_dummies(df, drop_first=True)
+    # Encode categorical columns after the split and align test columns to train.
+    X_train = pd.get_dummies(X_train_raw, drop_first=True)
+    X_test = pd.get_dummies(X_test_raw, drop_first=True)
+    X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
 
-# splitting x and y
-X = df_new.drop('G3', axis=1)
-Y = df_new['G3']
+    # Fit the scaler on training data only to avoid test-data leakage.
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+    # Train and evaluate Linear Regression.
+    model = LinearRegression()
+    model.fit(X_train_scaled, y_train)
+    y_pred = model.predict(X_test_scaled)
 
-# min max scaling on age and absences just to check
-mm = MinMaxScaler()
-sample_scaled = mm.fit_transform(X_train[['age', 'absences']])
-print(sample_scaled[:5])
+    mse = mean_squared_error(y_test, y_pred)
+    print("\nModel Evaluation")
+    print("MAE:", mean_absolute_error(y_test, y_pred))
+    print("MSE:", mse)
+    print("RMSE:", np.sqrt(mse))
+    print("R2 score:", r2_score(y_test, y_pred))
 
-# standard scaling for model
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
+    results = pd.DataFrame(
+        {"Actual": y_test.to_numpy(), "Predicted": y_pred},
+        index=y_test.index,
+    )
+    print("\nActual vs predicted grades (first 10 test rows):")
+    print(results.head(10))
 
-# training linear regression
-lr = LinearRegression()
-lr.fit(X_train, y_train)
+    # Compare actual and predicted grades with an ideal y = x reference line.
+    plt.figure(figsize=(7, 6))
+    plt.scatter(y_test, y_pred, alpha=0.7)
+    lower = min(float(y_test.min()), float(np.min(y_pred)))
+    upper = max(float(y_test.max()), float(np.max(y_pred)))
+    plt.plot([lower, upper], [lower, upper], "k--", linewidth=1)
+    plt.xlabel("Actual final grade (G3)")
+    plt.ylabel("Predicted final grade (G3)")
+    plt.title("Actual vs Predicted Final Grades")
+    plt.tight_layout()
+    plt.show()
 
-y_pred = lr.predict(X_test)
 
-# checking accuracy metrics
-print("MAE:", mean_absolute_error(y_test, y_pred))
-print("MSE:", mean_squared_error(y_test, y_pred))
-print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
-print("R2 score:", r2_score(y_test, y_pred))
-
-# comparing actual and predicted values
-res = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-print(res.head(10))
-
-# plotting actual vs predicted
-plt.scatter(y_test, y_pred)
-plt.xlabel('Actual G3')
-plt.ylabel('Predicted G3')
-plt.title('Actual vs Predicted')
-plt.show()
+if __name__ == "__main__":
+    main()
