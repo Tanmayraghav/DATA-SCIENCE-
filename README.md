@@ -1,74 +1,81 @@
 # Student Performance Prediction
 
-A beginner-friendly Data Science and Machine Learning project that estimates a student's final Mathematics grade (G3) using the UCI Student Performance dataset.
+A small machine learning project that looks at student information and estimates the final Mathematics grade (G3). It was made as a B.Tech CSE project to practise data analysis and basic machine learning.
 
 ## Team
 
-- **TANMAY RAGHAV**
-- **ADITYA SIROHI**
-- **RITIVIK SHARMA**
+- Tanmay Raghav
+- Aditya Sirohi
+- Ritivik Sharma
 
 **Submitted to:** Professor Nirbhay  
-**Academic Year:** 2026
+**Academic year:** 2026
 
-## Project objective
+## Dataset
 
-Explore student-related data, visualise patterns, prepare the dataset for machine learning, train two regression models, and compare their predictions using MAE, MSE, RMSE, and R².
+We used the Mathematics file (`student-mat.csv`) from the UCI Student Performance dataset.
 
-## Repository files
+- 395 student records
+- 33 columns
+- Target column: `G3` (final Mathematics grade, from 0 to 20)
 
-| File | Purpose |
+Dataset: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/320/student+performance)
+
+Citation: Cortez, P. (2008). *Student Performance* [Dataset]. https://doi.org/10.24432/C5TG7T.
+
+## Files in this repository
+
+| File | What it contains |
 |---|---|
-| student_performance_prediction.py | Data inspection, EDA, preprocessing, model training, and evaluation |
-| student-mat.csv | Mathematics subset of UCI Student Performance (395 records, 33 attributes) |
-| requirements.txt | Python libraries required to run the project |
-| reports/Student_Performance_Prediction_Project_Report.md | Project report |
+| `Student_Performance_Prediction.ipynb` | Notebook with the project steps and code |
+| `student_performance_prediction.py` | Python version of the project |
+| `student-mat.csv` | Mathematics dataset |
+| `requirements.txt` | Libraries needed to run the code |
+| `reports/Student_Performance_Prediction_Project_Report.md` | Project report |
 
-The script creates a results folder automatically. It saves the graphs, model comparison table, and sample predictions there.
+## What we did
 
-## Dataset attribution
+1. Loaded the dataset and checked its rows, columns, data types, missing values and duplicate records.
+2. Made graphs to understand the final-grade distribution, study-time groups, G2 and G3, absences and numerical correlations.
+3. Split the data into training and testing parts (80:20).
+4. Converted categorical columns into numeric columns.
+5. Scaled the features for Linear Regression.
+6. Trained Linear Regression and Random Forest.
+7. Compared their results using MAE, MSE, RMSE and R².
 
-The dataset is from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/320/student+performance).
+We kept G1 and G2 as input columns because the project assumes that earlier-period grades are known before estimating G3.
 
-Dataset citation: Cortez, P. (2008). *Student Performance* [Dataset]. https://doi.org/10.24432/C5TG7T.
+## Results from the notebook run
 
-The dataset is licensed under **CC BY 4.0**; attribution is provided here.
+The following values are from the notebook's 80:20 test split (random_state=42). Your results may change if the data or split changes.
 
-## Requirements
+| Model | MAE | MSE | RMSE | R² |
+|---|---:|---:|---:|---:|
+| Random Forest | 1.173 | 3.868 | 1.967 | 0.811 |
+| Linear Regression | 1.647 | 5.657 | 2.378 | 0.724 |
 
-Python 3.10 or newer is recommended.
-
-Install the required libraries:
-
-    python -m pip install -r requirements.txt
+Random Forest had the lower error on this test split. This does not mean it will always perform better on every dataset.
 
 ## Run the project
 
-Keep student_performance_prediction.py and student-mat.csv in the same folder, then run:
+Install the libraries:
 
-    python student_performance_prediction.py
+```bash
+python -m pip install -r requirements.txt
+```
 
-The script prints data-quality checks, evaluation metrics, and sample predictions. It also displays the graphs and saves them in the results folder.
+Run the Python file:
 
-## Methodology
+```bash
+python student_performance_prediction.py
+```
 
-1. Load and inspect the Mathematics dataset.
-2. Explore final-grade distribution, study-time patterns, absences, and numerical correlations.
-3. Split the data into 80% training and 20% test sets using random_state=42.
-4. Convert categorical features into numeric columns and align the test columns with the training columns.
-5. Scale the features for Linear Regression. The scaler is fitted only on training data.
-6. Train and compare Linear Regression and Random Forest using the same train-test split.
-7. Evaluate both models using MAE, MSE, RMSE, and R².
+For the notebook, open `Student_Performance_Prediction.ipynb` in Jupyter or Google Colab and run the cells from top to bottom. The notebook downloads the CSV from this repository if the file is not available locally.
 
-## Models
+The Python script saves graphs and result tables in a `results` folder.
 
-- **Linear Regression:** A simple baseline regression model.
-- **Random Forest Regressor:** Uses 200 decision trees and random_state=42.
+## A note about the prediction
 
-Lower MAE, MSE, and RMSE indicate smaller prediction errors. A higher R² generally indicates a better fit relative to a mean-baseline model.
+G1 and G2 are earlier grades, while G3 is the final grade. Since G1 and G2 are included as inputs, this project estimates G3 when those earlier grades are already available. It is a different problem from predicting a student's final grade before any exam marks are known.
 
-## Important modelling note
-
-The models include **G1** and **G2** as inputs when predicting **G3**. This represents a situation where first- and second-period grades are already available. For a different task that predicts final grades without earlier grades, remove G1 and G2 and evaluate that scenario separately.
-
-The project is for academic learning and should not be used alone to make high-stakes decisions about students.
+This is a classroom project for learning. Its predictions should not be used on their own to make important decisions about students.
