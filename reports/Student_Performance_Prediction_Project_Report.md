@@ -1,129 +1,151 @@
 # Student Performance Prediction
-## Machine Learning Project Report
+## Project Report
 
 **Submitted to:** Professor Nirbhay  
 **Department:** Computer Science and Engineering  
 **Institution:** GLA University, Greater Noida  
-**Academic Year:** 2026
+**Academic year:** 2026
 
-### Team Members
+### Team members
 
-1. **TANMAY RAGHAV**
-2. **ADITYA SIROHI**
-3. **RITIVIK SHARMA**
+1. Tanmay Raghav
+2. Aditya Sirohi
+3. Ritivik Sharma
 
 ## Abstract
 
-This project uses machine learning to estimate students' final Mathematics grades using the UCI Student Performance dataset. The workflow includes data inspection, exploratory data analysis, preprocessing, an 80:20 train-test split, Linear Regression, Random Forest, and model evaluation. Mean Absolute Error (MAE), Mean Squared Error (MSE), Root Mean Squared Error (RMSE), and R² are used to compare predictions. The script saves graphs and result tables in a results folder. The project is intended for academic learning and exploratory analysis, not high-stakes decisions about individual students.
+In this project, we used student data to estimate the final Mathematics grade (G3). We first checked the dataset and made a few graphs to understand it. After preparing the data, we trained two regression models: Linear Regression and Random Forest. We compared their predictions using MAE, MSE, RMSE and R². The Random Forest model had a lower error on the test data used in our notebook. This project helped us practise the basic steps involved in a machine learning project.
 
 ## 1. Introduction
 
-Student performance can be associated with previous grades, study time, attendance, and other demographic or school-related factors. Analysing historical data can help describe patterns in academic outcomes. This project demonstrates an introductory data science workflow and compares two regression models for predicting the final grade, G3.
+A student's final marks can be related to several things, such as previous marks, study time, attendance and family or school background. Looking at this information can help us understand patterns in the data.
 
-## 2. Problem Statement
+The aim of our project is to use the available student information to estimate the final Mathematics grade. We have kept the work focused on basic data analysis and two machine learning models.
 
-Build and evaluate machine learning models that estimate a student's final Mathematics grade from selected attributes, then compare predicted grades against actual grades in a held-out test set.
+## 2. Problem statement
+
+To build a regression model that estimates a student's final Mathematics grade (G3) and compare its predictions with the actual grades.
 
 ## 3. Objectives
 
-- Inspect the dataset's dimensions, data types, missing values, and duplicates.
-- Explore the distribution of final grades and relationships among selected variables.
-- Encode categorical data and prepare numerical features for modelling.
+- Understand the dataset and check its quality.
+- Use graphs to explore some of the columns.
+- Prepare categorical and numerical data for machine learning.
 - Train Linear Regression and Random Forest models.
-- Compare the models using MAE, MSE, RMSE, and R².
-- Discuss limitations and responsible use of predictions.
+- Compare the models using common regression metrics.
+- Explain the results and limitations of the project.
 
-## 4. Dataset Description
+## 4. Dataset
 
-This project uses the **Mathematics subset** (student-mat.csv) of the Student Performance dataset from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/320/student+performance). The CSV contains **395 student records and 33 attributes** covering demographic, family, school, study-time, attendance, and grade-related information. The target variable is **G3**, the final grade on a 0–20 scale.
+We used the Mathematics subset of the Student Performance dataset from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/320/student+performance).
 
-The code includes **G1** and **G2** (first- and second-period grades) as model inputs. This is suitable when earlier grades are known at prediction time. To predict final grades without prior grades, those columns should be excluded and that alternative task evaluated separately.
+The file used is `student-mat.csv`. It contains 395 records and 33 attributes. The columns include information about students, their family and school, study time, absences and grades.
 
-## 5. Tools and Technologies
+The column we want to predict is **G3**, which is the final Mathematics grade. Its scale is 0 to 20.
+
+We have also used **G1** and **G2** as input features. These columns contain the first- and second-period grades. This means our model estimates the final grade when the earlier grades are already available.
+
+## 5. Software and libraries
 
 - Python
-- Pandas and NumPy
-- Matplotlib and Seaborn
+- Jupyter Notebook / Google Colab
+- Pandas
+- NumPy
+- Matplotlib
+- Seaborn
 - Scikit-learn
-- UCI Student Performance dataset
 
-## 6. Methodology
+## 6. Steps followed
 
-### 6.1 Data Loading and Inspection
+### 6.1 Loading and checking the data
 
-The script loads student-mat.csv using pandas.read_csv with a semicolon delimiter. It prints the dataset shape, columns, data types, missing-value counts, and duplicate count, and removes duplicate rows if present.
+We loaded the CSV file using Pandas. The file uses a semicolon as the separator. We checked the shape, column names, data types, missing values and duplicate rows.
 
-### 6.2 Exploratory Data Analysis
+In the notebook run, the dataset had 395 rows and 33 columns. No missing values or duplicate rows were found.
 
-The code produces:
+### 6.2 Exploratory data analysis
 
-- A histogram of G3 final grades.
-- A bar plot comparing study-time categories with average final grade.
-- A scatter plot of G2 versus G3.
-- A box plot for absences.
-- A correlation heatmap for numerical variables.
+We made the following graphs:
 
-The average G3 for each study-time category is also printed. These plots show associations and do not establish causation. The absences box plot is used to inspect possible outliers; the script does not automatically delete them.
+1. **Final grade distribution:** to see how the G3 marks are spread.
+2. **Study time and final grade:** to compare the average G3 for different study-time categories.
+3. **G2 and G3:** to see how the second-period marks are related to final marks.
+4. **Absences box plot:** to inspect the distribution of student absences.
+5. **Correlation heatmap:** to view correlations between numerical columns.
 
-### 6.3 Preprocessing
+We also calculated the average G3 for each study-time category. These graphs help describe the data, but they do not prove that one factor causes a change in marks.
 
-The target G3 is separated from the features before the raw data is split into training and test subsets using an 80:20 split with random_state=42. Categorical columns are encoded using pandas.get_dummies, and test columns are aligned to the training columns.
+### 6.3 Data preprocessing
 
-StandardScaler is fitted on the training features only and then applied to both sets for Linear Regression. Random Forest uses the encoded features without scaling because tree-based models do not require standardised feature values.
+First, we separated G3 from the other columns. Then we divided the data into training and testing sets in an 80:20 ratio. We used `random_state=42` so the same split can be reproduced.
 
-### 6.4 Model Training
+The categorical columns were converted into numeric columns using one-hot encoding. We also aligned the test columns with the training columns so both sets had the same features.
 
-Two models are trained using the same training and test split:
+For Linear Regression, we used StandardScaler. The scaler was fitted on the training data and then applied to the test data. Random Forest was trained on the encoded data without scaling.
 
-- **Linear Regression:** A simple baseline regression model.
-- **Random Forest Regressor:** An ensemble model using 200 trees and random_state=42.
+### 6.4 Model training
 
-### 6.5 Evaluation Metrics
+We trained two models:
 
-- **MAE:** Average absolute prediction error; lower is better.
-- **MSE:** Average squared prediction error; lower is better and larger errors receive more weight.
-- **RMSE:** Square root of MSE, in target-grade units; lower is better.
-- **R²:** Measures model performance relative to a mean-baseline model; higher is generally better, and it can be negative.
+**Linear Regression**
 
-## 7. Results and Discussion
+This model is used as a basic starting point for predicting a continuous value. It tries to fit a linear relationship between the input features and the final grade.
 
-Run student_performance_prediction.py. The script prints the actual test-set metrics for both models and saves the comparison to results/model_comparison.csv.
+**Random Forest Regressor**
 
-Enter the values from that generated table below after running the script. Do not estimate or invent metric values.
+This model uses multiple decision trees and combines their predictions. In our code, we used 200 trees and `random_state=42`.
+
+Both models used the same training and test split.
+
+## 7. Model evaluation
+
+We used four metrics to compare the predictions:
+
+- **MAE:** the average absolute difference between actual and predicted marks. A lower value is better.
+- **MSE:** the average of squared errors. A lower value is better.
+- **RMSE:** the square root of MSE. It is expressed in the same units as the grade.
+- **R²:** shows how well the model performs compared with predicting the average grade. A higher value is generally better.
+
+### 7.1 Results
+
+These are the values produced by the executed notebook:
 
 | Model | MAE | MSE | RMSE | R² |
 |---|---:|---:|---:|---:|
-| Linear Regression | __________ | __________ | __________ | __________ |
-| Random Forest | __________ | __________ | __________ | __________ |
+| Random Forest | 1.173418 | 3.867641 | 1.966632 | 0.811381 |
+| Linear Regression | 1.646666 | 5.656643 | 2.378370 | 0.724134 |
 
-The script also saves a model comparison graph and an actual-versus-predicted graph in the results folder. Lower MAE and RMSE indicate smaller errors. The results should be interpreted in the context of this dataset and this particular train-test split.
+Random Forest gave a lower MAE, MSE and RMSE, and a higher R² than Linear Regression on this test split. So, based on this particular run, Random Forest performed better.
+
+The result is based on one 80:20 split. It should not be treated as a guarantee that Random Forest will always be better.
+
+### 7.2 Actual and predicted values
+
+The notebook also displays a small table of actual and predicted marks for ten test records. It creates an actual-versus-predicted graph for both models. These help us see how close the predictions are to the actual grades.
 
 ## 8. Limitations
 
-- The dataset contains 395 Mathematics student records, so it is relatively small.
-- The models may not generalise to other schools, years, or student populations.
-- Linear Regression may not capture complex relationships.
-- Results can vary with a different train-test split.
-- Including G1 and G2 changes the task because previous grades are useful inputs.
-- Historical association does not prove causation.
-- Predictions should not be used alone to label students or make consequential decisions.
+- The dataset has 395 Mathematics records, so it is not very large.
+- The data comes from a particular study and may not represent every school or student group.
+- The result can change with a different train-test split.
+- G1 and G2 are included as input features. A model that does not use earlier grades would be a different experiment.
+- The graphs show patterns in the dataset, not proof of cause and effect.
+- The model's output is an estimate and may not be correct for an individual student.
 
-## 9. Future Scope
+## 9. Future improvements
 
-- Compare predictions when G1 and G2 are included versus excluded.
-- Use cross-validation for a more stable estimate of model performance.
-- Test the models on suitable external data before considering real-world use.
-- Explore additional models only when there is a clear reason to do so.
+If we continue this project, we can try cross-validation to check whether the results stay similar across different splits. We can also compare a version that does not use G1 and G2, which would answer a different prediction question.
 
 ## 10. Conclusion
 
-This project demonstrates a basic machine learning workflow for student grade prediction, from data inspection and exploratory analysis to preprocessing, model training, and evaluation. Linear Regression provides a simple baseline, while Random Forest provides a second model for comparison. Final conclusions should be based on the actual test results generated by the script. The project highlights clear task definition, prevention of data leakage, and responsible use of student-related predictions.
+We completed the main steps of a basic machine learning project: loading data, checking it, exploring it with graphs, preprocessing, training models and comparing their results.
+
+In our notebook run, Random Forest performed better than Linear Regression on the selected test set. The project gave us practical experience with Pandas, data visualisation and Scikit-learn. It also showed us why the input columns and the way we test a model matter when explaining its results.
 
 ## References
 
-1. Cortez, P., & Silva, A. (2008). *Using Data Mining to Predict Secondary School Student Performance*. Proceedings of the 5th Future Business Technology Conference (FUBUTEC).
-2. Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5TG7T
-3. Pandas documentation: https://pandas.pydata.org/docs/
-4. Scikit-learn documentation: https://scikit-learn.org/stable/
-5. Matplotlib documentation: https://matplotlib.org/stable/
-6. Seaborn documentation: https://seaborn.pydata.org/
+1. Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5TG7T
+2. Pandas documentation: https://pandas.pydata.org/docs/
+3. Scikit-learn documentation: https://scikit-learn.org/stable/
+4. Matplotlib documentation: https://matplotlib.org/stable/
+5. Seaborn documentation: https://seaborn.pydata.org/
