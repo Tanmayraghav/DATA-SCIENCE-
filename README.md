@@ -1,58 +1,98 @@
-<p align="center"><img src="assets/project-banner.svg" alt="Student Performance Prediction" width="100%"></p>
+<p align="center">
+  <img src="assets/project-banner.svg" alt="Student Performance Prediction project banner" width="100%">
+</p>
 
-<p align="center"><b>Machine Learning Project | B.Tech CSE</b><br>GLA University, Greater Noida · 2026</p>
+<p align="center">
+  <b>Machine Learning Project | B.Tech Computer Science &amp; Engineering</b><br>
+  GLA University, Greater Noida · Academic Year 2026
+</p>
+
+<p align="center">
+  <a href="reports/Student_Performance_Prediction_Project_Report.pdf"><img src="https://img.shields.io/badge/Read-Project%20Report-20B8A6?style=for-the-badge" alt="Read project report"></a>
+  <a href="notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Open-Notebook-183852?style=for-the-badge" alt="Open notebook"></a>
+  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Google Colab"></a>
+</p>
 
 # Student Performance Prediction
 
-A machine-learning project using the UCI Student Performance Mathematics dataset to estimate final grade (G3).
+An end-to-end beginner-friendly machine learning project that explores student information and predicts the **final Mathematics grade (G3)** using Linear Regression and Random Forest. It covers data inspection, exploratory data analysis (EDA), preprocessing, model training and evaluation.
 
-## Two prediction settings
+## Project overview
 
-1. **With G1 and G2:** estimates G3 when first- and second-period grades are already known.
-2. **Without G1 and G2:** estimates G3 using the other student attributes.
+| Dataset | Target | Models compared | Best test R² |
+|:--|:--|:--|--:|
+| 395 records · 33 columns | G3 (0–20) | Linear Regression, Random Forest | **0.811** |
 
-These are different prediction tasks. Including earlier grades is not automatically data leakage when they are genuinely available at prediction time.
+## Model results
 
-## Models and evaluation
+Results from the fixed 80:20 train-test split (random_state=42). Lower MAE, MSE and RMSE are better; higher R² is better.
 
-- Mean baseline, Linear Regression, Random Forest and tuned Random Forest.
-- Five-fold cross-validation and GridSearchCV use training data only.
-- One 80:20 hold-out test split is kept for final evaluation.
-- Pipeline and ColumnTransformer handle imputation, encoding and scaling.
-- Metrics: MAE, MSE, RMSE and R².
-- Visuals: actual vs predicted, residual plots and feature importance.
+| Model | MAE | MSE | RMSE | R² |
+|:--|--:|--:|--:|--:|
+| **Random Forest** | **1.173** | **3.868** | **1.967** | **0.811** |
+| Linear Regression | 1.647 | 5.657 | 2.378 | 0.724 |
 
-**Results:** Run the notebook or Python script to generate updated metrics. Previous single-split scores are not presented as results for these expanded experiments.
+Random Forest performed better on this particular test split. This does not guarantee better performance on every dataset or school.
 
-## G3 = 0 records
+## Workflow
 
-Zero-grade records are retained. The project reports their count and checks performance on positive-grade test records separately. The dataset does not establish why an individual record has a zero grade, so no cause is assumed.
+1. Load and inspect the Mathematics dataset, including data types, missing values and duplicates.
+2. Explore grade distribution, study time, G2 vs G3, absences and numerical correlations.
+3. Split the data into training and test sets (80:20).
+4. Encode categorical features; scale features for Linear Regression using a scaler fitted only on training data.
+5. Train both models and compare MAE, MSE, RMSE and R².
+6. Save plots, model metrics and sample predictions in the results folder.
 
 ## Dataset
 
-[UCI Student Performance dataset](https://archive.ics.uci.edu/dataset/320/student+performance). The Mathematics file contains 395 records and 33 attributes. The target is G3 (0–20).
+The project uses the Mathematics CSV (student-mat.csv) from the [UCI Student Performance dataset](https://archive.ics.uci.edu/dataset/320/student+performance).
 
-## Run
+- 395 student records and 33 attributes.
+- Prediction target: G3, the final Mathematics grade on a 0–20 scale.
+- No missing values or duplicate rows were found in the saved project run.
 
-**Colab:** [Open notebook](https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb) and select Runtime → Run all. The notebook downloads the CSV if it is not found locally.
+**Important:** G1 and G2 (first- and second-period grades) are included as input features. The model estimates G3 when earlier grades are already available; it is not an early prediction before those grades are known.
 
-**Local:** Install with `python -m pip install -r requirements.txt`, then run `python src/student_performance_prediction.py` from the repository root.
+## Run locally
 
-Graphs are displayed directly; graph and result files are not saved.
+### 1. Install dependencies
+
+~~~bash
+python -m pip install -r requirements.txt
+~~~
+
+### 2. Run the Python script
+
+Run this command from the repository root:
+
+~~~bash
+python src/student_performance_prediction.py
+~~~
+
+The script reads data/student-mat.csv and creates a results folder containing graphs and CSV result files.
+
+### 3. Run the notebook
+
+Open notebooks/Student_Performance_Prediction.ipynb in Jupyter or use the **Open in Colab** link above. Run the cells from top to bottom. The notebook looks for the dataset locally and downloads it from this repository when running in a fresh Colab session.
 
 ## Repository structure
 
-```text
+~~~text
 DATA-SCIENCE-/
-├── assets/project-banner.svg
-├── data/student-mat.csv
-├── notebooks/Student_Performance_Prediction.ipynb
-├── reports/Student_Performance_Prediction_Project_Report.pdf
-├── src/student_performance_prediction.py
+├── assets/
+│   └── project-banner.svg
+├── data/
+│   └── student-mat.csv
+├── notebooks/
+│   └── Student_Performance_Prediction.ipynb
+├── reports/
+│   └── Student_Performance_Prediction_Project_Report.pdf
+├── src/
+│   └── student_performance_prediction.py
 ├── .gitignore
 ├── README.md
 └── requirements.txt
-```
+~~~
 
 ## Team
 
@@ -60,16 +100,13 @@ DATA-SCIENCE-/
 - Aditya Sirohi
 - Ritivik Sharma
 
-**Submitted to:** Professor Nirbhay · **Institution:** GLA University, Greater Noida
+**Submitted to:** Professor Nirbhay  
+**Institution:** GLA University, Greater Noida
 
 ## Limitations
 
-- The dataset contains 395 Mathematics records.
-- Cross-validation supports model selection but is not external validation.
-- GridSearchCV tests a small predefined parameter grid.
-- Feature importance is not causal evidence.
-- Predictions should not be used alone for important decisions about individual students.
+This is a classroom project based on 395 records and one hold-out split. Results may change with a different split or student population. Future improvements could include cross-validation, a separate experiment without G1 and G2, hyperparameter tuning and validation on data from other schools. Predictions should not be used alone to make important decisions about students.
 
 ## Reference
 
-Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. [DOI: 10.24432/C5TG7T](https://doi.org/10.24432/C5TG7T).
+Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. [https://doi.org/10.24432/C5TG7T](https://doi.org/10.24432/C5TG7T).
