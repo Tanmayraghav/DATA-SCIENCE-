@@ -10,7 +10,7 @@
 <p align="center">
   <a href="reports/Student_Performance_Prediction_Project_Report.pdf"><img src="https://img.shields.io/badge/Read-Project%20Report-20B8A6?style=for-the-badge" alt="Read project report"></a>
   <a href="notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Open-Notebook-183852?style=for-the-badge" alt="Open notebook"></a>
-  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Google Colab"></a>
+  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Colab"></a>
 </p>
 
 # Student Performance Prediction
@@ -41,7 +41,7 @@ Random Forest performed better on this particular test split. This does not guar
 3. Split the data into training and test sets (80:20).
 4. Encode categorical features; scale features for Linear Regression using a scaler fitted only on training data.
 5. Train both models and compare MAE, MSE, RMSE and R².
-6. Save plots, model metrics and sample predictions in the results folder.
+6. Display graphs, model metrics and sample predictions directly; no output files are created.
 
 ## Dataset
 
@@ -69,11 +69,11 @@ Run this command from the repository root:
 python src/student_performance_prediction.py
 ~~~
 
-The script reads data/student-mat.csv and creates a results folder containing graphs and CSV result files.
+The graphs appear directly in the plotting window or notebook output. The script does not save graphs or result CSV files.
 
-### 3. Run the notebook
+### 3. Run in Google Colab
 
-Open notebooks/Student_Performance_Prediction.ipynb in Jupyter or use the **Open in Colab** link above. Run the cells from top to bottom. The notebook looks for the dataset locally and downloads it from this repository when running in a fresh Colab session.
+Open the notebook using the **Run in Colab** link above and run all cells. Graphs appear directly below their respective cells and are not saved to a results folder.
 
 ## Repository structure
 

@@ -5,7 +5,7 @@ Predicts final Mathematics grade (G3) using the UCI Student Performance dataset.
 Run from the repository root:
     python src/student_performance_prediction.py
 
-Graphs and result tables are saved in the root results/ folder.
+All graphs are displayed directly. No graph or result files are saved.
 """
 
 from pathlib import Path
@@ -23,20 +23,16 @@ from sklearn.preprocessing import StandardScaler
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = PROJECT_ROOT / "data" / "student-mat.csv"
-RESULTS_DIR = PROJECT_ROOT / "results"
 
 
-def save_plot(filename):
-    """Save the current graph and display it."""
+def show_plot():
+    """Display the current graph without saving it."""
     plt.tight_layout()
-    plt.savefig(RESULTS_DIR / filename, dpi=300, bbox_inches="tight")
     plt.show()
     plt.close()
 
 
 def main():
-    RESULTS_DIR.mkdir(exist_ok=True)
-
     # Load the Mathematics dataset. The CSV uses semicolons as separators.
     if not DATA_PATH.exists():
         raise FileNotFoundError(
@@ -45,10 +41,8 @@ def main():
 
     df = pd.read_csv(DATA_PATH, sep=";")
 
-    # Inspect data quality.
+    # Check data quality.
     print("Dataset shape:", df.shape)
-    print("\nColumns:\n", df.columns.tolist())
-    print("\nData types:\n", df.dtypes)
     print("\nMissing values:\n", df.isnull().sum())
     print("\nDuplicate rows:", df.duplicated().sum())
     df = df.drop_duplicates().copy()
@@ -59,38 +53,37 @@ def main():
     plt.title("Final Grade (G3) Distribution")
     plt.xlabel("Final grade")
     plt.ylabel("Number of students")
-    save_plot("grade_distribution.png")
+    show_plot()
 
     plt.figure(figsize=(8, 5))
     sns.barplot(data=df, x="studytime", y="G3", errorbar=None)
     plt.title("Study Time vs Final Grade")
     plt.xlabel("Weekly study-time category")
     plt.ylabel("Average final grade (G3)")
-    save_plot("study_time_vs_grade.png")
+    show_plot()
 
     plt.figure(figsize=(8, 5))
     plt.scatter(df["G2"], df["G3"], alpha=0.7)
     plt.xlabel("Second-period grade (G2)")
     plt.ylabel("Final grade (G3)")
     plt.title("Second-period Grade vs Final Grade")
-    save_plot("g2_vs_g3.png")
+    show_plot()
 
     plt.figure(figsize=(8, 3))
     sns.boxplot(x=df["absences"])
     plt.title("Absences: Box Plot")
-    save_plot("absences_boxplot.png")
+    show_plot()
 
     numeric_df = df.select_dtypes(include=np.number)
     plt.figure(figsize=(12, 8))
     sns.heatmap(numeric_df.corr(), cmap="coolwarm", center=0)
-    plt.title("Correlation Heatmap (Numerical Variables)")
-    save_plot("correlation_heatmap.png")
+    plt.title("Correlation Heatmap")
+    show_plot()
 
     print("\nAverage final grade by study time:")
     print(df.groupby("studytime")["G3"].mean())
 
-    # Separate the target and features before splitting the data.
-    # G1 and G2 are included because earlier grades are available as inputs.
+    # G1 and G2 are included because earlier grades are assumed to be known.
     X = df.drop(columns=["G3"])
     y = df["G3"]
 
@@ -103,12 +96,11 @@ def main():
     X_test = pd.get_dummies(X_test_raw, drop_first=True)
     X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
 
-    # Scale features for Linear Regression. Fit only on training data.
+    # Scale features for Linear Regression only.
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    # Compare two models using the same train-test split.
     models = {
         "Linear Regression": (
             LinearRegression(),
@@ -131,24 +123,19 @@ def main():
         predictions[model_name] = y_pred
 
         mse = mean_squared_error(y_test, y_pred)
-        metric_rows.append(
-            {
-                "Model": model_name,
-                "MAE": mean_absolute_error(y_test, y_pred),
-                "MSE": mse,
-                "RMSE": np.sqrt(mse),
-                "R2": r2_score(y_test, y_pred),
-            }
-        )
+        metric_rows.append({
+            "Model": model_name,
+            "MAE": mean_absolute_error(y_test, y_pred),
+            "MSE": mse,
+            "RMSE": np.sqrt(mse),
+            "R2": r2_score(y_test, y_pred),
+        })
 
     comparison = pd.DataFrame(metric_rows).sort_values("RMSE")
-    print("\nModel Comparison")
+    print("\nModel Comparison:")
     print(comparison.to_string(index=False, float_format=lambda value: f"{value:.3f}"))
 
-    # Save the numerical comparison so it can be used in the project report.
-    comparison.to_csv(RESULTS_DIR / "model_comparison.csv", index=False)
-
-    # Plot MAE and RMSE for both models.
+    # Compare model errors.
     error_data = comparison.melt(
         id_vars="Model",
         value_vars=["MAE", "RMSE"],
@@ -159,9 +146,9 @@ def main():
     sns.barplot(data=error_data, x="Model", y="Error", hue="Metric")
     plt.title("Model Error Comparison")
     plt.ylabel("Error (lower is better)")
-    save_plot("model_comparison.png")
+    show_plot()
 
-    # Plot actual vs predicted grades for both models.
+    # Compare actual and predicted final grades.
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     for ax, (model_name, y_pred) in zip(axes, predictions.items()):
         ax.scatter(y_test, y_pred, alpha=0.7)
@@ -173,24 +160,18 @@ def main():
         ax.set_title(model_name)
 
     fig.suptitle("Actual vs Predicted Final Grades")
-    save_plot("actual_vs_predicted.png")
+    show_plot()
 
-    # Save sample predictions from the model with the lower test RMSE.
+    # Show sample predictions from the model with the lower test RMSE.
     best_model_name = comparison.iloc[0]["Model"]
-    best_predictions = predictions[best_model_name]
-    results = pd.DataFrame(
-        {
-            "Actual": y_test.to_numpy(),
-            "Predicted": best_predictions,
-        },
-        index=y_test.index,
-    )
-    print(f"\nSample predictions from {best_model_name} (first 10 test rows):")
-    print(results.head(10))
-    results.to_csv(RESULTS_DIR / "sample_predictions.csv", index_label="Student_Row")
+    sample_results = pd.DataFrame({
+        "Actual": y_test.to_numpy(),
+        "Predicted": predictions[best_model_name],
+    }, index=y_test.index)
 
+    print(f"\nSample predictions from {best_model_name}:")
+    print(sample_results.head(10).round(2))
     print(f"\nLowest test RMSE in this comparison: {best_model_name}")
-    print(f"All graphs and result files are saved in: {RESULTS_DIR}")
 
 
 if __name__ == "__main__":
