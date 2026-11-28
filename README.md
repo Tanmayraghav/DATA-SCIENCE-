@@ -8,9 +8,9 @@
 </p>
 
 <p align="center">
-  <a href="reports/Student_Performance_Prediction_Project_Report.pdf"><img src="https://img.shields.io/badge/Read-Project%20Report-20B8A6?style=for-the-badge" alt="Read project report"></a>
-  <a href="notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Open-Notebook-183852?style=for-the-badge" alt="Open notebook"></a>
-  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Colab"></a>
+  <a href="2_Report/Student_Performance_Prediction_Project_Report.pdf"><img src="https://img.shields.io/badge/Read-Project%20Report-20B8A6?style=for-the-badge" alt="Read project report"></a>
+  <a href="1_Code/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Open-Notebook-183852?style=for-the-badge" alt="Open notebook"></a>
+  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/1_Code/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Colab"></a>
 </p>
 
 # Student Performance Prediction
@@ -66,7 +66,7 @@ python -m pip install -r requirements.txt
 Run this command from the repository root:
 
 ~~~bash
-python src/student_performance_prediction.py
+python 1_Code/student_performance_prediction.py
 ~~~
 
 The graphs appear directly in the plotting window or notebook output. The script does not save graphs or result CSV files.
@@ -79,16 +79,15 @@ Open the notebook using the **Run in Colab** link above and run all cells. Graph
 
 ~~~text
 DATA-SCIENCE-/
+├── 1_Code/
+│   ├── student_performance_prediction.py
+│   └── Student_Performance_Prediction.ipynb
+├── 2_Report/
+│   └── Student_Performance_Prediction_Project_Report.pdf
+├── 3_Dataset/
+│   └── student-mat.csv
 ├── assets/
 │   └── project-banner.svg
-├── data/
-│   └── student-mat.csv
-├── notebooks/
-│   └── Student_Performance_Prediction.ipynb
-├── reports/
-│   └── Student_Performance_Prediction_Project_Report.pdf
-├── src/
-│   └── student_performance_prediction.py
 ├── .gitignore
 ├── README.md
 └── requirements.txt
