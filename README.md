@@ -8,54 +8,52 @@
 </p>
 
 <p align="center">
-  <a href="reports/Student_Performance_Prediction_Project_Report.md"><img src="https://img.shields.io/badge/Read-Project%20Report-20B8A6?style=for-the-badge" alt="Read project report"></a>
-  <a href="Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Open-Notebook-183852?style=for-the-badge" alt="Open notebook"></a>
-  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Google Colab"></a>
+  <a href="reports/Student_Performance_Prediction_Project_Report.pdf"><img src="https://img.shields.io/badge/Read-Project%20Report-20B8A6?style=for-the-badge" alt="Read project report"></a>
+  <a href="notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Open-Notebook-183852?style=for-the-badge" alt="Open notebook"></a>
+  <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb"><img src="https://img.shields.io/badge/Run%20in-Google%20Colab-F9AB00?style=for-the-badge&amp;logo=googlecolab&amp;logoColor=white" alt="Run in Google Colab"></a>
 </p>
 
 # Student Performance Prediction
 
-A small end-to-end machine learning project that explores student information and predicts the <strong>final Mathematics grade (G3)</strong> using Linear Regression and Random Forest. The project covers data inspection, exploratory data analysis (EDA), preprocessing, model training and evaluation.
+An end-to-end beginner-friendly machine learning project that explores student information and predicts the **final Mathematics grade (G3)** using Linear Regression and Random Forest. It covers data inspection, exploratory data analysis (EDA), preprocessing, model training and evaluation.
 
-## Project at a glance
+## Project overview
 
-| Dataset | Target | Models compared | Best test R-squared |
+| Dataset | Target | Models compared | Best test R² |
 |:--|:--|:--|--:|
-| 395 records · 33 columns | <code>G3</code> (0-20) | Linear Regression, Random Forest | <strong>0.811</strong> |
+| 395 records · 33 columns | G3 (0–20) | Linear Regression, Random Forest | **0.811** |
 
-## Results
+## Model results
 
-The following values are from the notebook's fixed <strong>80:20 train-test split</strong> (<code>random_state=42</code>). Lower MAE, MSE and RMSE are better; higher R-squared is better.
+Results from the fixed 80:20 train-test split (random_state=42). Lower MAE, MSE and RMSE are better; higher R² is better.
 
-| Model | MAE | MSE | RMSE | R-squared |
+| Model | MAE | MSE | RMSE | R² |
 |:--|--:|--:|--:|--:|
-| <strong>Random Forest</strong> | <strong>1.173</strong> | <strong>3.868</strong> | <strong>1.967</strong> | <strong>0.811</strong> |
+| **Random Forest** | **1.173** | **3.868** | **1.967** | **0.811** |
 | Linear Regression | 1.647 | 5.657 | 2.378 | 0.724 |
 
-> <strong>Result:</strong> Random Forest performed better on this particular test split. This does not guarantee that it will perform better on every dataset or school.
+Random Forest performed better on this particular test split. This does not guarantee better performance on every dataset or school.
 
-## Project workflow
+## Workflow
 
-1. <strong>Load and inspect</strong> the Mathematics dataset; check dimensions, data types, missing values and duplicates.
-2. <strong>Explore the data</strong> with the final-grade distribution, study-time comparison, G2 vs G3 scatter plot, absences box plot and numerical correlation heatmap.
-3. <strong>Preprocess</strong> by separating G3, making an 80:20 split, one-hot encoding categorical variables and aligning train/test features.
-4. <strong>Scale</strong> the encoded features for Linear Regression using a scaler fitted only on the training data. Random Forest uses the encoded features without scaling.
-5. <strong>Train and evaluate</strong> both regressors using MAE, MSE, RMSE and R-squared; inspect actual-versus-predicted values.
+1. Load and inspect the Mathematics dataset, including data types, missing values and duplicates.
+2. Explore grade distribution, study time, G2 vs G3, absences and numerical correlations.
+3. Split the data into training and test sets (80:20).
+4. Encode categorical features; scale features for Linear Regression using a scaler fitted only on training data.
+5. Train both models and compare MAE, MSE, RMSE and R².
+6. Save plots, model metrics and sample predictions in the results folder.
 
 ## Dataset
 
-We use the Mathematics file, <code>student-mat.csv</code>, from the <a href="https://archive.ics.uci.edu/dataset/320/student+performance">UCI Student Performance dataset</a>.
+The project uses the Mathematics CSV (student-mat.csv) from the [UCI Student Performance dataset](https://archive.ics.uci.edu/dataset/320/student+performance).
 
-- <strong>395 student records</strong> and <strong>33 attributes</strong>.
-- <strong>Target:</strong> G3, the final Mathematics grade on a 0-20 scale.
-- The columns include student, family and school details, study and social information, absences, and period grades.
-- No missing values or duplicate rows were found in the saved notebook run.
+- 395 student records and 33 attributes.
+- Prediction target: G3, the final Mathematics grade on a 0–20 scale.
+- No missing values or duplicate rows were found in the saved project run.
 
-### Important prediction note
+**Important:** G1 and G2 (first- and second-period grades) are included as input features. The model estimates G3 when earlier grades are already available; it is not an early prediction before those grades are known.
 
-G1 and G2 (the first- and second-period grades) are retained as input features. The model therefore estimates G3 when earlier grades are already available. Predicting final grades before earlier exam results are known would be a different experiment.
-
-## Run the project
+## Run locally
 
 ### 1. Install dependencies
 
@@ -65,44 +63,50 @@ python -m pip install -r requirements.txt
 
 ### 2. Run the Python script
 
+Run this command from the repository root:
+
 ~~~bash
-python student_performance_prediction.py
+python src/student_performance_prediction.py
 ~~~
 
-The script reads <code>student-mat.csv</code> from the repository folder and saves graphs and result tables in a <code>results/</code> directory.
+The script reads data/student-mat.csv and creates a results folder containing graphs and CSV result files.
 
 ### 3. Run the notebook
 
-Open <a href="Student_Performance_Prediction.ipynb">Student_Performance_Prediction.ipynb</a> in Jupyter, or <a href="https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/Student_Performance_Prediction.ipynb">open it directly in Google Colab</a>. Run the cells from top to bottom. The notebook can download the CSV from this repository when a local copy is not available.
+Open notebooks/Student_Performance_Prediction.ipynb in Jupyter or use the **Open in Colab** link above. Run the cells from top to bottom. The notebook looks for the dataset locally and downloads it from this repository when running in a fresh Colab session.
 
-## Repository contents
+## Repository structure
 
 ~~~text
-DATA-SCIENCE- /
-├── Student_Performance_Prediction.ipynb
-├── student_performance_prediction.py
-├── student-mat.csv
-├── requirements.txt
+DATA-SCIENCE-/
 ├── assets/
 │   └── project-banner.svg
-└── reports/
-    └── Student_Performance_Prediction_Project_Report.md
+├── data/
+│   └── student-mat.csv
+├── notebooks/
+│   └── Student_Performance_Prediction.ipynb
+├── reports/
+│   └── Student_Performance_Prediction_Project_Report.pdf
+├── src/
+│   └── student_performance_prediction.py
+├── .gitignore
+├── README.md
+└── requirements.txt
 ~~~
 
 ## Team
 
-- <strong>Tanmay Raghav</strong>
-- <strong>Aditya Sirohi</strong>
-- <strong>Ritivik Sharma</strong>
+- Tanmay Raghav
+- Aditya Sirohi
+- Ritivik Sharma
 
-<strong>Submitted to:</strong> Professor Nirbhay<br>
-<strong>Institution:</strong> GLA University, Greater Noida
+**Submitted to:** Professor Nirbhay  
+**Institution:** GLA University, Greater Noida
 
-## Limitations and next steps
+## Limitations
 
-This is a classroom project based on 395 records and one hold-out split. Results may change with a different split or population. Future work could use cross-validation, test a version without G1 and G2, inspect residuals by grade range, tune model parameters and validate on data from other schools. Predictions should not be used alone for important decisions about students.
+This is a classroom project based on 395 records and one hold-out split. Results may change with a different split or student population. Future improvements could include cross-validation, a separate experiment without G1 and G2, hyperparameter tuning and validation on data from other schools. Predictions should not be used alone to make important decisions about students.
 
-## References
+## Reference
 
-1. Cortez, P. (2008). <em>Student Performance</em> [Dataset]. UCI Machine Learning Repository. <a href="https://doi.org/10.24432/C5TG7T">https://doi.org/10.24432/C5TG7T</a>.
-2. <a href="https://pandas.pydata.org/docs/">Pandas documentation</a> · <a href="https://scikit-learn.org/stable/">Scikit-learn documentation</a> · <a href="https://matplotlib.org/stable/">Matplotlib</a> · <a href="https://seaborn.pydata.org/">Seaborn</a>.
+Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. [https://doi.org/10.24432/C5TG7T](https://doi.org/10.24432/C5TG7T).

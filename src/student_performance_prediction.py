@@ -2,8 +2,10 @@
 Student Performance Prediction
 Predicts final Mathematics grade (G3) using the UCI Student Performance dataset.
 
-Run: python student_performance_prediction.py
-Graphs and result tables are saved in the results folder.
+Run from the repository root:
+    python src/student_performance_prediction.py
+
+Graphs and result tables are saved in the root results/ folder.
 """
 
 from pathlib import Path
@@ -19,9 +21,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_PATH = BASE_DIR / "student-mat.csv"
-RESULTS_DIR = BASE_DIR / "results"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "data" / "student-mat.csv"
+RESULTS_DIR = PROJECT_ROOT / "results"
 
 
 def save_plot(filename):
@@ -38,7 +40,7 @@ def main():
     # Load the Mathematics dataset. The CSV uses semicolons as separators.
     if not DATA_PATH.exists():
         raise FileNotFoundError(
-            f"Dataset not found: {DATA_PATH}. Keep student-mat.csv beside this script."
+            f"Dataset not found: {DATA_PATH}. Keep student-mat.csv in the data/ folder."
         )
 
     df = pd.read_csv(DATA_PATH, sep=";")
