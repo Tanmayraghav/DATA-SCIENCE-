@@ -3,16 +3,23 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# Environments
+# Virtual environments and environment files
 .venv/
 venv/
 env/
+.env
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Generated outputs
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Generated output
 results/
+outputs/
 
 # OS files
 .DS_Store

@@ -1,75 +1,109 @@
-<p align="center"><img src="assets/project-banner.svg" alt="Student Performance Prediction" width="100%"></p>
+<p align="center"><img src="05_Assets/project-banner.svg" alt="Student Performance Prediction" width="100%"></p>
 
 <p align="center"><b>Machine Learning Project | B.Tech CSE</b><br>GLA University, Greater Noida · 2026</p>
 
 # Student Performance Prediction
 
-A machine-learning project using the UCI Student Performance Mathematics dataset to estimate final grade (G3).
+A regression-based machine-learning project that explores student attributes and predicts the final Mathematics grade (G3) using the UCI Student Performance dataset.
 
-## Two prediction settings
+**Team:** Tanmay Raghav · Aditya Sirohi · Ritivik Sharma  
+**Submitted to:** Professor Nirbhay, GLA University
 
-1. **With G1 and G2:** estimates G3 when first- and second-period grades are already known.
-2. **Without G1 and G2:** estimates G3 using the other student attributes.
+## Project files
 
-These are different prediction tasks. Including earlier grades is not automatically data leakage when they are genuinely available at prediction time.
-
-## Models and evaluation
-
-- Mean baseline, Linear Regression, Random Forest and tuned Random Forest.
-- Five-fold cross-validation and GridSearchCV use training data only.
-- One 80:20 hold-out test split is kept for final evaluation.
-- Pipeline and ColumnTransformer handle imputation, encoding and scaling.
-- Metrics: MAE, MSE, RMSE and R².
-- Visuals: actual vs predicted, residual plots and feature importance.
-
-**Results:** Run the notebook or Python script to generate updated metrics. Previous single-split scores are not presented as results for these expanded experiments.
-
-## G3 = 0 records
-
-Zero-grade records are retained. The project reports their count and checks performance on positive-grade test records separately. The dataset does not establish why an individual record has a zero grade, so no cause is assumed.
+| Resource | Open |
+|---|---|
+| Main Python code | [student_performance_prediction.py](01_Code/student_performance_prediction.py) |
+| Project report (PDF) | [Student_Performance_Prediction_Project_Report.pdf](02_Report/Student_Performance_Prediction_Project_Report.pdf) |
+| Dataset | [student-mat.csv](03_Dataset/student-mat.csv) |
+| Executed notebook | [Student_Performance_Prediction.ipynb](04_Notebook/Student_Performance_Prediction.ipynb) |
+| Run notebook in Colab | [Open in Google Colab](https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/04_Notebook/Student_Performance_Prediction.ipynb) |
 
 ## Dataset
 
-[UCI Student Performance dataset](https://archive.ics.uci.edu/dataset/320/student+performance). The Mathematics file contains 395 records and 33 attributes. The target is G3 (0–20).
+The project uses the Mathematics (student-mat.csv) file from the UCI Student Performance dataset. It contains **395 student records and 33 columns**, with G3 as the final-grade target on a 0–20 scale. The included dataset has no missing values.
 
-## Run
+Dataset source: [UCI Machine Learning Repository - Student Performance](https://archive.ics.uci.edu/dataset/320/student+performance)  
+Reference: Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. [DOI: 10.24432/C5TG7T](https://doi.org/10.24432/C5TG7T)
 
-**Colab:** [Open notebook](https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/notebooks/Student_Performance_Prediction.ipynb) and select Runtime → Run all. The notebook downloads the CSV if it is not found locally.
+## Prediction settings
 
-**Local:** Install with `python -m pip install -r requirements.txt`, then run `python src/student_performance_prediction.py` from the repository root.
+The experiment compares two different use cases:
 
-Graphs are displayed directly; graph and result files are not saved.
+1. **With G1 and G2:** predicts the final grade when first- and second-period grades are already available.
+2. **Without G1 and G2:** predicts the final grade from the remaining attributes when earlier grades are unavailable.
+
+G1 and G2 are earlier-period grades. Their inclusion is not automatically data leakage when they are known at prediction time. The two settings represent different prediction tasks.
+
+## Methodology
+
+- One fixed 80:20 train/test split using random_state=42.
+- Mean baseline, Linear Regression and Random Forest comparisons.
+- Five-fold cross-validation performed on the training split.
+- GridSearchCV for Random Forest hyperparameter selection.
+- Pipeline and ColumnTransformer for fold-safe imputation, scaling and one-hot encoding.
+- Hold-out metrics: MAE, MSE, RMSE and R².
+- Exploratory charts, actual-vs-predicted plots, residual plots and Random Forest feature importance.
+
+## Results from the executed notebook
+
+The values below are from the saved notebook execution. MAE and RMSE are in grade points; higher R² is better.
+
+| Prediction setting | Model | MAE | RMSE | R² |
+|---|---|---:|---:|---:|
+| With G1/G2 | Mean baseline | 3.646 | 4.550 | -0.010 |
+| With G1/G2 | Linear Regression | 1.647 | 2.378 | 0.724 |
+| With G1/G2 | Random Forest (default) | **1.188** | **2.007** | **0.804** |
+| With G1/G2 | Random Forest (tuned) | 1.195 | 2.019 | 0.801 |
+| Without G1/G2 | Mean baseline | 3.646 | 4.550 | -0.010 |
+| Without G1/G2 | Linear Regression | 3.395 | 4.196 | 0.141 |
+| Without G1/G2 | Random Forest (default) | **2.994** | **3.748** | **0.315** |
+| Without G1/G2 | Random Forest (tuned) | 3.052 | 3.822 | 0.287 |
+
+The default Random Forest achieved the lowest hold-out RMSE in both settings. The tuned Random Forest had slightly lower mean cross-validation RMSE on the training split (1.386 with G1/G2; 3.875 without G1/G2), but that did not translate into better hold-out scores in this run. Cross-validation and final test results are both reported.
+
+When G1 and G2 were excluded, Random Forest hold-out R² fell from 0.804 to 0.315. Earlier grades provide strong predictive information for this task. Feature importance is descriptive and must not be interpreted as causal evidence.
+
+## G3 = 0 records
+
+There are **38 records** with G3 = 0 (about 9.6% of the dataset). All 38 also have absences = 0 in the included CSV. The dataset does not explain why their grades are zero, so no cause is assumed. The main experiment retains these records; positive-grade test-record metrics are shown separately in the report and notebook.
+
+## Run the project
+
+### Google Colab
+
+Open the [notebook in Colab](https://colab.research.google.com/github/Tanmayraghav/DATA-SCIENCE-/blob/main/04_Notebook/Student_Performance_Prediction.ipynb), then choose **Runtime → Run all**. The notebook downloads the CSV from this repository if student-mat.csv is not present in the Colab working directory.
+
+### Local machine
+
+    git clone https://github.com/Tanmayraghav/DATA-SCIENCE-.git
+    cd DATA-SCIENCE-
+    python -m pip install -r requirements.txt
+    python 01_Code/student_performance_prediction.py
+
+Python 3.10 or later is recommended. The script reads the CSV from 03_Dataset/ and displays plots and evaluation tables.
 
 ## Repository structure
 
-```text
-DATA-SCIENCE-/
-├── assets/project-banner.svg
-├── data/student-mat.csv
-├── notebooks/Student_Performance_Prediction.ipynb
-├── reports/Student_Performance_Prediction_Project_Report.pdf
-├── src/student_performance_prediction.py
-├── .gitignore
-├── README.md
-└── requirements.txt
-```
-
-## Team
-
-- Tanmay Raghav
-- Aditya Sirohi
-- Ritivik Sharma
-
-**Submitted to:** Professor Nirbhay · **Institution:** GLA University, Greater Noida
+    DATA-SCIENCE-/
+    ├── 01_Code/
+    │   └── student_performance_prediction.py
+    ├── 02_Report/
+    │   └── Student_Performance_Prediction_Project_Report.pdf
+    ├── 03_Dataset/
+    │   └── student-mat.csv
+    ├── 04_Notebook/
+    │   └── Student_Performance_Prediction.ipynb
+    ├── 05_Assets/
+    │   └── project-banner.svg
+    ├── .gitignore
+    ├── README.md
+    └── requirements.txt
 
 ## Limitations
 
-- The dataset contains 395 Mathematics records.
-- Cross-validation supports model selection but is not external validation.
-- GridSearchCV tests a small predefined parameter grid.
-- Feature importance is not causal evidence.
-- Predictions should not be used alone for important decisions about individual students.
-
-## Reference
-
-Cortez, P. (2008). *Student Performance* [Dataset]. UCI Machine Learning Repository. [DOI: 10.24432/C5TG7T](https://doi.org/10.24432/C5TG7T).
+- The dataset contains 395 records from one subject and one source; external validation is not performed.
+- The train/test split is a single hold-out sample. Cross-validation is performed only within the training portion.
+- The hyperparameter search covers a small, predefined parameter grid.
+- The model estimates grades from historical data; it does not establish that changing a feature will change a student's grade.
+- Predictions should not be used alone to make high-impact decisions about individual students.
